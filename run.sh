@@ -11,6 +11,10 @@ function _get_file_name() {
   if [ "$EMOJI_NAME_TYPE" = "split" ]; then
     first=$(echo "$name" | cut -c1)
     last=$(echo "$name" | cut -c2-)
+    second_char=$(echo "$last"|cut -c 1)
+    if [ $second_char = "-" ]; then
+      last=$(echo "$last"|sed "s/-//")
+    fi
 
     ## replace invalid chars
     echo "${first}_${last}" | tr -d "[:blank:]" | tr "." "_" | tr " " "_" | tr "[:upper:]" "[:lower:]"
@@ -32,11 +36,11 @@ function filter_users() {
 
   # filter not target user
   if [[ "$target_user" != "*" ]]; then
-    users="$(join <(echo "$users" | sort -u) <(echo "$target_user" | tr ',' '\n' | sort -u))"
+    users="$(/usr/bin/join <(echo "$users" | sort -u) <(echo "$target_user" | tr ',' '\n' | sort -u))"
   fi
 
   # filter ignore users
-  join -v 1 <(echo "$users" | sort -u) <(echo "$IGNORE_USERS" | tr ',' '\n' | sort -u)
+  /usr/bin/join -v 1 <(echo "$users" | sort -u) <(echo "$IGNORE_USERS" | tr ',' '\n' | sort -u)
 }
 
 function exit_if_not_found() {
